@@ -1,6 +1,6 @@
 output "elasticsearch_eip" {
   description = "Public IP address of the NAT gateway."
-  value       = aws_eip.elasticsearch_eip.public_ip
+  value       = aws_eip.elasticsearch_nat_eip.public_ip
 }
 
 output "elasticsearch_vpc_id" {
@@ -10,12 +10,12 @@ output "elasticsearch_vpc_id" {
 
 output "elasticsearch_subnet_id_map" {
   description = "Map of AZs with corresponding subnet IDs"
-  value       = { for az, subnet in aws_subnet.elasticsearch_subnet : az => subnet.id }
+  value       = { for az, subnet in aws_subnet.elasticsearch_private_subnet : az => subnet.id }
 }
 
 output "elasticsearch_subnet_ids" {
   description = "List of subnet IDs"
-  value       = values({ for az, subnet in aws_subnet.elasticsearch_subnet : az => subnet.id })
+  value       = values({ for az, subnet in aws_subnet.elasticsearch_private_subnet : az => subnet.id })
 }
 
 

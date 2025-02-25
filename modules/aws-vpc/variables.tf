@@ -13,6 +13,11 @@ variable "project_env" {
   }
 }
 
+variable "az_list" {
+  type        = list(string)
+  description = "List of Availability Zones to create subnets in."
+}
+
 variable "vpc_cidr" {
   type        = string
   description = "Main CIDR of VPC to create"
@@ -22,7 +27,11 @@ variable "vpc_cidr" {
   }
 }
 
-variable "az_list" {
-  type        = list(string)
-  description = "List of Availability Zones to create subnets in."
+variable "public_subnet_cidr" {
+  type        = string
+  description = "CIDR of NAT gateway public subnet"
+  validation {
+    condition     = can(cidrhost(var.public_subnet_cidr, 32))
+    error_message = "Must be valid IPv4 CIDR."
+  }
 }

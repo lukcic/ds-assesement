@@ -53,3 +53,9 @@ terraform init
 ## Node discovery
 
 ## Scaling
+
+## Improvements
+
+1. Multiple NAT Gateways.
+
+In the production environment each private subnet should have separate NAT gateway. Here we're deploying only one to reduce costs (dev).
