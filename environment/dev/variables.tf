@@ -25,6 +25,48 @@ variable "aws_region" {
 }
 
 variable "az_list" {
-  type        = list(string)
+  type        = set(string)
   description = "List of Availability Zones to create subnets in."
+  default     = ["eu-north-1a", "eu-north-1b", "eu-north-1c"]
+}
+
+variable "ssh_public_key" {
+  type        = string
+  description = "Value of the SSH public key."
+}
+
+variable "ami" {
+  description = "AMI ID, if nor provided, latest Debian 12 image will be used."
+  type = object({
+    id = optional(string)
+  })
+  default = null
+}
+
+variable "master_ec2_config" {
+  type = object({
+    instance_type    = string
+    root_volume_size = number
+  })
+  default = {
+    instance_type    = "t3.large"
+    root_volume_size = 30
+  }
+}
+
+variable "node_ec2_config" {
+  type = object({
+    instance_type    = string
+    root_volume_size = number
+    min_size         = number
+    max_size         = number
+    desired_size     = number
+  })
+  default = {
+    instance_type    = "t3.large"
+    root_volume_size = 50
+    min_size         = 2
+    max_size         = 5
+    desired_size     = 3
+  }
 }

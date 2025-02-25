@@ -37,6 +37,14 @@ resource "aws_eip" "elasticsearch_eip" {
   }
 }
 
+resource "aws_internet_gateway" "elasticsearch_int_gw" {
+  vpc_id = aws_vpc.elasticsearch_vpc.id
+
+  tags = {
+    Name = "${var.project_name}-${var.project_env}-int_gateway"
+  }
+}
+
 # In production each private subnet should have separate NAT gateway. 
 # Here we're deploying only one in VPC to reduce costs (dev).
 resource "aws_nat_gateway" "elasticsearch_nat_gateway" {
@@ -65,7 +73,7 @@ resource "aws_route_table" "elasticsearch_route_table" {
   }
 
   tags = {
-    Name = "${var.project_name}-${var.project_env}-nat-route-table"
+    Name = "${var.project_name}-${var.project_env}-route_table"
   }
 }
 

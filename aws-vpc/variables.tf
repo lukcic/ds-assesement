@@ -16,6 +16,10 @@ variable "project_env" {
 variable "vpc_cidr" {
   type        = string
   description = "Main CIDR of VPC to create"
+  validation {
+    condition     = can(cidrhost(var.vpc_cidr, 32))
+    error_message = "Must be valid IPv4 CIDR."
+  }
 }
 
 variable "az_list" {
