@@ -23,3 +23,8 @@ variable "aws_region" {
   description = "AWS Region name"
   default     = "eu-north-1"
 }
+
+variable "az_list" {
+  type        = list(string)
+  description = "List of Availability Zones to create subnets in."
+}

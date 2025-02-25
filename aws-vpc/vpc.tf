@@ -3,16 +3,8 @@ module "subnet_addrs" {
 
   base_cidr_block = var.vpc_cidr
   networks = [
-    {
-      name     = "eun1-az1"
-      new_bits = 8
-    },
-    {
-      name     = "eun1-az2"
-      new_bits = 8
-    },
-    {
-      name     = "eun1-az3"
+    for az in var.az_list : {
+      name     = az
       new_bits = 8
     }
   ]
@@ -45,14 +37,12 @@ resource "aws_eip" "elasticsearch_eip" {
   }
 }
 
-output "elasticsearch_eip" {
-  value = aws_eip.elasticsearch_eip.public_ip
-}
-
+# In production each private subnet should have separate NAT gateway. 
+# Here we're deploying only one in VPC to reduce costs (dev).
 resource "aws_nat_gateway" "elasticsearch_nat_gateway" {
   connectivity_type = "public"
   allocation_id     = aws_eip.elasticsearch_eip.id
-  subnet_id         = aws_subnet.elasticsearch_subnet["eun1-az1"].id
+  subnet_id         = aws_subnet.elasticsearch_subnet[var.az_list[0]].id
   depends_on        = [aws_subnet.elasticsearch_subnet, aws_eip.elasticsearch_eip]
 
   tags = {
@@ -61,8 +51,6 @@ resource "aws_nat_gateway" "elasticsearch_nat_gateway" {
 }
 
 resource "aws_route_table" "elasticsearch_route_table" {
-  for_each = module.subnet_addrs.network_cidr_blocks
-
   vpc_id     = aws_vpc.elasticsearch_vpc.id
   depends_on = [aws_nat_gateway.elasticsearch_nat_gateway]
 
@@ -72,7 +60,7 @@ resource "aws_route_table" "elasticsearch_route_table" {
   }
 
   route {
-    cidr_block     = "0.0.0.0/24"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.elasticsearch_nat_gateway.id
   }
 
