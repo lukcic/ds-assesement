@@ -24,6 +24,26 @@ variable "aws_region" {
   default     = "eu-north-1"
 }
 
+variable "vpc_cidr" {
+  type        = string
+  description = "Main VPC CIDR"
+  default     = "10.10.0.0/16"
+  validation {
+    condition     = can(cidrhost(var.vpc_cidr, 32))
+    error_message = "Must be valid IPv4 CIDR."
+  }
+}
+
+variable "public_subnet_cidr" {
+  type        = string
+  description = "CIDR of NAT (public) subnet"
+  default     = "10.10.200.0/24"
+  validation {
+    condition     = can(cidrhost(var.public_subnet_cidr, 32))
+    error_message = "Must be valid IPv4 CIDR."
+  }
+}
+
 variable "az_list" {
   type        = set(string)
   description = "List of Availability Zones to create subnets in."
@@ -69,4 +89,11 @@ variable "node_ec2_config" {
     max_size         = 5
     desired_size     = 3
   }
+}
+
+variable "elasticsearch_config" {
+  type = object({
+    cluster_name    = string
+    elastic_version = string
+  })
 }

@@ -1,5 +1,6 @@
 resource "aws_instance" "elasticsearch_master" {
-  for_each = module.aws-vpc.elasticsearch_subnet_id_map
+  for_each   = module.aws-vpc.elasticsearch_subnet_id_map
+  depends_on = [module.aws-vpc]
 
   instance_type          = var.master_ec2_config.instance_type
   ami                    = var.ami != null ? var.ami.id : data.aws_ami.debian-12.id
@@ -16,6 +17,7 @@ resource "aws_instance" "elasticsearch_master" {
     hostname_type = "resource-name"
   }
 
+  private_ip = module.aws-vpc.elasticsearch_master_ips[each.key]
 
   root_block_device {
     delete_on_termination = true
@@ -31,7 +33,11 @@ resource "aws_instance" "elasticsearch_master" {
     Name = "${var.project_name}-${var.project_env}-master_node-${each.key}"
   }
 
-  user_data_replace_on_change = false
+  user_data = templatefile("${path.module}/userdata-master.sh", {
+    cluster_name    = var.elasticsearch_config.cluster_name
+    elastic_version = var.elasticsearch_config.elastic_version
+    master_node_ips = join(",", [for az in var.az_list : module.aws-vpc.elasticsearch_master_ips[az]])
+  })
 
-  # user_data = file("${path.module}/userdata.sh")
+  user_data_replace_on_change = true
 }

@@ -23,3 +23,8 @@ output "elasticsearch_cidr_blocks" {
   value       = values(module.subnet_addrs.network_cidr_blocks)
   description = "List of network CIDRs"
 }
+
+output "elasticsearch_master_ips" {
+  description = "List of Master Nodes IPs"
+  value       = { for az, scidr in module.subnet_addrs.network_cidr_blocks : az => cidrhost(scidr, 10) }
+}

@@ -1,11 +1,17 @@
 resource "aws_launch_template" "elasticsearch_launch_template" {
+  depends_on             = [module.aws-vpc]
   name_prefix            = "${var.project_name}-${var.project_env}-elasticsearch_node"
   image_id               = var.ami != null ? var.ami.id : data.aws_ami.debian-12.id
   instance_type          = var.node_ec2_config.instance_type
   key_name               = aws_key_pair.elasticsearch_key_pair.id
   vpc_security_group_ids = [aws_security_group.elasticsearch_main.id]
-  # user_data = file("${path.module}/userdata.sh")
-  ebs_optimized = true
+  ebs_optimized          = true
+
+  user_data = base64encode(templatefile("${path.module}/userdata-node.sh", {
+    cluster_name    = var.elasticsearch_config.cluster_name
+    elastic_version = var.elasticsearch_config.elastic_version
+    master_node_ips = join(",", [for az in var.az_list : module.aws-vpc.elasticsearch_master_ips[az]])
+  }))
 
   block_device_mappings {
     device_name = "/dev/xvda"
@@ -24,7 +30,9 @@ resource "aws_launch_template" "elasticsearch_launch_template" {
   }
 
   tags = {
-    Name = "${var.project_name}-${var.project_env}_asg_instance"
+    key                 = "Name"
+    value               = "elasticsearch_asg_provisioned_instance"
+    propagate_at_launch = true
   }
 }
 

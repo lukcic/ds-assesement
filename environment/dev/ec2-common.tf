@@ -14,12 +14,12 @@ data "aws_ami" "debian-12" {
 }
 
 resource "aws_key_pair" "elasticsearch_key_pair" {
-  key_name   = "${var.project_name}-${var.project_env}-elasticsearch_ssh_key_pair"
+  key_name   = "${var.project_name}-${var.project_env}-elasticsearch-ssh_key_pair"
   public_key = var.ssh_public_key
 }
 
 resource "aws_iam_role" "elasticsearch_iam_role" {
-  name        = "${var.project_name}-${var.project_env}-elasticsearch_ssm_role"
+  name        = "${var.project_name}-${var.project_env}-elasticsearch-ssm_role"
   description = "Role for Elasticsearch ec2 instances"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
@@ -37,7 +37,7 @@ resource "aws_iam_role" "elasticsearch_iam_role" {
 }
 
 resource "aws_iam_instance_profile" "elasticsearch_iam_profile" {
-  name = "${var.project_name}-${var.project_env}-elasticserach_ec2_profile"
+  name = "${var.project_name}-${var.project_env}-elasticsearch-ec2_profile"
   role = aws_iam_role.elasticsearch_iam_role.name
 }
 
@@ -67,31 +67,27 @@ resource "aws_security_group_rule" "egress" {
 }
 
 resource "aws_security_group_rule" "elasticsearch_http_traffic" {
-  security_group_id = aws_security_group.elasticsearch_main.id
-  description       = "Elasticsearch HTTP traffic"
-  type              = "ingress"
-  from_port         = 9200
-  to_port           = 9300
-  protocol          = "tcp"
-  # Allow Inbound from own Security Group
-  # cidr_blocks       = module.aws-vpc.elasticsearch_cidr_blocks
+  security_group_id        = aws_security_group.elasticsearch_main.id
+  description              = "Elasticsearch HTTP traffic"
+  type                     = "ingress"
+  from_port                = 9200
+  to_port                  = 9300
+  protocol                 = "TCP"
   source_security_group_id = aws_security_group.elasticsearch_main.id
 }
 
 resource "aws_security_group_rule" "elasticsearch_node_traffic" {
-  security_group_id = aws_security_group.elasticsearch_main.id
-  description       = "Elasticsearch node to node communication"
-  type              = "ingress"
-  from_port         = 9300
-  to_port           = 9400
-  protocol          = "tcp"
-  # Allow Inbound from own Security Group
-  # cidr_blocks       = module.aws-vpc.elasticsearch_cidr_blocks
+  security_group_id        = aws_security_group.elasticsearch_main.id
+  description              = "Elasticsearch node to node communication"
+  type                     = "ingress"
+  from_port                = 9300
+  to_port                  = 9400
+  protocol                 = "TCP"
   source_security_group_id = aws_security_group.elasticsearch_main.id
 }
 
 resource "aws_placement_group" "elasticsearch_partition_group" {
-  name            = "${var.project_name}-${var.project_env}-es_partition"
+  name            = "${var.project_name}-${var.project_env}-es-partition"
   strategy        = "partition"
   partition_count = 3
 }
