@@ -1,5 +1,5 @@
 module "aws-vpc" {
-  source = "../../aws-vpc"
+  source = "../../modules/aws-vpc"
 
   vpc_cidr     = "10.10.0.0/16"
   az_list      = var.az_list
