@@ -28,12 +28,6 @@ resource "aws_launch_template" "elasticsearch_launch_template" {
   private_dns_name_options {
     hostname_type = "resource-name"
   }
-
-  tags = {
-    key                 = "Name"
-    value               = "elasticsearch_asg_provisioned_instance"
-    propagate_at_launch = true
-  }
 }
 
 resource "aws_autoscaling_group" "elasticsearch_asg" {
@@ -54,5 +48,10 @@ resource "aws_autoscaling_group" "elasticsearch_asg" {
   launch_template {
     id      = aws_launch_template.elasticsearch_launch_template.id
     version = "$Latest"
+  }
+  tag {
+    key                 = "Name"
+    value               = "${var.project_name}-${var.project_env}-data_node-asg"
+    propagate_at_launch = true
   }
 }

@@ -25,7 +25,7 @@ resource "aws_instance" "elasticsearch_master" {
     volume_type           = "gp3"
     volume_size           = var.master_ec2_config.root_volume_size
     tags = {
-      Name = "${var.project_name}-${var.project_env}-es_root_volume_${each.key}"
+      Name = "${var.project_name}-${var.project_env}-es-root_vol_${each.key}"
     }
   }
 
@@ -39,5 +39,5 @@ resource "aws_instance" "elasticsearch_master" {
     master_node_ips = join(",", [for az in var.az_list : module.aws-vpc.elasticsearch_master_ips[az]])
   })
 
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
 }

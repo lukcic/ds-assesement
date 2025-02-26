@@ -28,4 +28,4 @@ sed -i 's/xpack.security.enabled: true/xpack.security.enabled: false/g' /etc/ela
 sed -i 's/xpack.security.enrollment.enabled: true/xpack.security.enrollment.enabled: false/g' /etc/elasticsearch/elasticsearch.yml
 
 systemctl enable --now elasticsearch.service
-curl -XGET 'http://localhost:9200/_cluster/health?wait_for_status=yellow' | jq
+curl -s -XGET 'http://localhost:9200/_cluster/health?wait_for_status=yellow' | jq

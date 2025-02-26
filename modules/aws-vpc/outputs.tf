@@ -25,6 +25,6 @@ output "elasticsearch_cidr_blocks" {
 }
 
 output "elasticsearch_master_ips" {
-  description = "List of Master Nodes IPs"
-  value       = { for az, scidr in module.subnet_addrs.network_cidr_blocks : az => cidrhost(scidr, 10) }
+  description = "Map of AZs with Master Nodes IPs"
+  value       = { for az, cidr in module.subnet_addrs.network_cidr_blocks : az => cidrhost(cidr, 10) }
 }

@@ -69,7 +69,7 @@ variable "master_ec2_config" {
     root_volume_size = number
   })
   default = {
-    instance_type    = "t3.large"
+    instance_type    = "t3.medium"
     root_volume_size = 30
   }
 }
